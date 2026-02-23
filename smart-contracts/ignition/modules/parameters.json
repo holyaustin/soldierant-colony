@@ -1,0 +1,6 @@
+{
+  "DeployAll": {
+    "territoryStakingAddress": "0x0000000000000000000000000000000000000000",
+    "tournamentSystemAddress": "0x0000000000000000000000000000000000000000"
+  }
+}
