@@ -55,3 +55,42 @@ After setting the variable, you can run the deployment with the Sepolia network:
 ```shell
 npx hardhat ignition deploy --network sepolia ignition/modules/Counter.ts
 ```
+
+
+5. How to Use
+After Deploying to Fuji Testnet:
+First, deploy your contracts and note the addresses:
+
+bash
+npx hardhat ignition deploy ignition/modules/DeployAll.ts --network fuji
+Update the addresses in scripts/verify-contracts.ts with your deployed addresses
+
+Run the verification script:
+
+bash
+# Verify all contracts at once
+npm run verify:fuji
+
+# Or verify individually
+npm run verify:honeydew fuji <CONTRACT_ADDRESS>
+npm run verify:antnft fuji <CONTRACT_ADDRESS>
+After Deploying to Avalanche Mainnet:
+bash
+# Verify all contracts at once
+npm run verify:mainnet
+
+# Or verify individually
+npm run verify:honeydew avalanche <CONTRACT_ADDRESS>
+npm run verify:antnft avalanche <CONTRACT_ADDRESS>
+6. Direct CLI Verification (Alternative)
+You can also verify directly without scripts:
+
+bash
+# For Fuji Testnet
+npx hardhat verify --network fuji <CONTRACT_ADDRESS>
+
+# For Mainnet
+npx hardhat verify --network avalanche <CONTRACT_ADDRESS>
+
+# With constructor arguments (if needed)
+npx hardhat verify --network fuji <CONTRACT_ADDRESS> "arg1" 1000

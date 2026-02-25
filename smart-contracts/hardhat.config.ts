@@ -6,12 +6,14 @@ import hardhatTypechain from "@nomicfoundation/hardhat-typechain";
 import hardhatMocha from "@nomicfoundation/hardhat-mocha";
 import hardhatEthersChaiMatchers from "@nomicfoundation/hardhat-ethers-chai-matchers";
 import hardhatNetworkHelpers from "@nomicfoundation/hardhat-network-helpers";
+import hardhatVerify from "@nomicfoundation/hardhat-verify";
 import * as dotenv from "dotenv";
 
 dotenv.config();
 
 export default defineConfig({
   plugins: [
+    hardhatVerify,
     hardhatToolboxMochaEthersPlugin,
     hardhatEthers,
     hardhatTypechain,
@@ -65,5 +67,13 @@ export default defineConfig({
       chainId: 43114,
       gasPrice: 25000000000,
     }
+  },
+  verify: {
+    etherscan: {
+      apiKey: process.env.ETHERSCAN_API_KEY || "",
+    },
+    blockscout: {
+      enabled: true,
+    },
   },
 });

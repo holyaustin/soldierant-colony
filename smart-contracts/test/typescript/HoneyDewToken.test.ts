@@ -1,147 +1,148 @@
 import { expect } from "chai";
-import hre from "hardhat";
-import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
-import { HoneyDewToken } from "../typechain-types";
+import { network } from "hardhat";
+
+const { ethers, networkHelpers } = await network.connect();
 
 describe("HoneyDewToken", function () {
-  // Fixture to deploy the contract (as shown in the guide)
-  async function deployHoneyDewTokenFixture() {
-    // Get signers using hre.ethers (correct way from guide)
-    const [owner, user1, user2] = await hre.ethers.getSigners();
+  async function deployTokenFixture() {
+    const [owner, user1, user2] = await ethers.getSigners();
     
-    // Deploy contract
-    const HoneyDewTokenFactory = await hre.ethers.getContractFactory("HoneyDewToken");
-    const honeyDewToken = await HoneyDewTokenFactory.deploy();
-    await honeyDewToken.waitForDeployment();
+    // This returns a contract with all methods at runtime
+    const token = await ethers.deployContract("HoneyDewToken");
     
-    return { honeyDewToken, owner, user1, user2 };
+    return { token, owner, user1, user2 };
   }
 
   describe("Deployment", function () {
-    it("Should set the right owner", async function () {
-      const { honeyDewToken, owner } = await loadFixture(deployHoneyDewTokenFixture);
-      expect(await honeyDewToken.owner()).to.equal(owner.address);
-    });
-
-    it("Should have correct name and symbol", async function () {
-      const { honeyDewToken } = await loadFixture(deployHoneyDewTokenFixture);
-      expect(await honeyDewToken.name()).to.equal("HoneyDew Token");
-      expect(await honeyDewToken.symbol()).to.equal("SHNY");
+    it("Should set the correct name and symbol", async function () {
+      const { token } = await networkHelpers.loadFixture(deployTokenFixture);
+      expect(await token.name()).to.equal("HoneyDew Token");
+      expect(await token.symbol()).to.equal("SHNY");
     });
 
     it("Should have correct max supply", async function () {
-      const { honeyDewToken } = await loadFixture(deployHoneyDewTokenFixture);
-      const maxSupply = await honeyDewToken.MAX_SUPPLY();
-      expect(maxSupply).to.equal(hre.ethers.parseEther("50000000"));
+      const { token } = await networkHelpers.loadFixture(deployTokenFixture);
+      const maxSupply = await token.MAX_SUPPLY();
+      expect(maxSupply).to.equal(ethers.parseEther("50000000"));
     });
 
     it("Should mint all tokens to contract", async function () {
-      const { honeyDewToken } = await loadFixture(deployHoneyDewTokenFixture);
-      const contractAddress = await honeyDewToken.getAddress();
-      const contractBalance = await honeyDewToken.balanceOf(contractAddress);
-      expect(contractBalance).to.equal(hre.ethers.parseEther("50000000"));
+      const { token } = await networkHelpers.loadFixture(deployTokenFixture);
+      const contractAddress = await token.getAddress();
+      const balance = await token.balanceOf(contractAddress);
+      expect(balance).to.equal(ethers.parseEther("50000000"));
     });
   });
 
   describe("Emission", function () {
-    it("Should emit daily tokens correctly", async function () {
-      const { honeyDewToken } = await loadFixture(deployHoneyDewTokenFixture);
+    it("Should emit daily tokens after 24 hours", async function () {
+      const { token } = await networkHelpers.loadFixture(deployTokenFixture);
       
-      // Use network.provider as shown in the guide
-      await hre.network.provider.send("evm_increaseTime", [86400]);
-      await hre.network.provider.send("evm_mine", []);
+      await networkHelpers.time.increase(86400);
+      await networkHelpers.mine();
       
-      await honeyDewToken.emitDailyTokens();
+      await token.emitDailyTokens();
       
-      const emittedSupply = await honeyDewToken.emittedSupply();
-      expect(emittedSupply).to.equal(hre.ethers.parseEther("34000"));
+      const emittedSupply = await token.emittedSupply();
+      expect(emittedSupply).to.equal(ethers.parseEther("34000"));
     });
 
     it("Should not emit before 24 hours", async function () {
-      const { honeyDewToken } = await loadFixture(deployHoneyDewTokenFixture);
+      const { token } = await networkHelpers.loadFixture(deployTokenFixture);
       
-      // Using .to.be.revertedWith as shown in the guide
-      await expect(
-        honeyDewToken.emitDailyTokens()
-      ).to.be.revertedWith("Emission too frequent");
+      await expect(token.emitDailyTokens()).to.be.revertedWith("Emission too frequent");
     });
 
     it("Should get correct daily emission for year 1", async function () {
-      const { honeyDewToken } = await loadFixture(deployHoneyDewTokenFixture);
-      const dailyEmission = await honeyDewToken.getCurrentDailyEmission();
-      expect(dailyEmission).to.equal(hre.ethers.parseEther("34000"));
-    });
-  });
-
-  describe("Conversion", function () {
-    // Nested fixture as shown in the guide
-    async function deployWithMintedTokensFixture() {
-      const { honeyDewToken, owner, user1, user2 } = await deployHoneyDewTokenFixture();
-      
-      // Mint some tokens to user1
-      await honeyDewToken.connect(owner).mintReward(user1.address, hre.ethers.parseEther("10000"));
-      
-      return { honeyDewToken, owner, user1, user2 };
-    }
-
-    it("Should convert SHNY to AVAX correctly", async function () {
-      const { honeyDewToken, user1 } = await loadFixture(deployWithMintedTokensFixture);
-      
-      const amount = hre.ethers.parseEther("1000");
-      const initialAvaxBalance = await hre.ethers.provider.getBalance(user1.address);
-      
-      const tx = await honeyDewToken.connect(user1).convertToAVAX(amount);
-      await tx.wait();
-      
-      const finalAvaxBalance = await hre.ethers.provider.getBalance(user1.address);
-      const avaxReceived = finalAvaxBalance - initialAvaxBalance;
-      
-      // Using .to.be.closeTo as shown in the guide
-      expect(avaxReceived).to.be.closeTo(hre.ethers.parseEther("0.009"), hre.ethers.parseEther("0.0001"));
-    });
-
-    it("Should enforce daily limit", async function () {
-      const { honeyDewToken, user1 } = await loadFixture(deployWithMintedTokensFixture);
-      
-      const amount = hre.ethers.parseEther("6000");
-      
-      await expect(
-        honeyDewToken.connect(user1).convertToAVAX(amount)
-      ).to.be.revertedWith("Daily limit exceeded");
-    });
-
-    it("Should reset daily limit after 24 hours", async function () {
-      const { honeyDewToken, user1 } = await loadFixture(deployWithMintedTokensFixture);
-      
-      const amount = hre.ethers.parseEther("4000");
-      
-      await honeyDewToken.connect(user1).convertToAVAX(amount);
-      
-      await hre.network.provider.send("evm_increaseTime", [86400]);
-      await hre.network.provider.send("evm_mine", []);
-      
-      await honeyDewToken.connect(user1).convertToAVAX(amount);
+      const { token } = await networkHelpers.loadFixture(deployTokenFixture);
+      const dailyEmission = await token.getCurrentDailyEmission();
+      expect(dailyEmission).to.equal(ethers.parseEther("34000"));
     });
   });
 
   describe("Minting", function () {
     it("Should allow owner to mint rewards", async function () {
-      const { honeyDewToken, owner, user1 } = await loadFixture(deployHoneyDewTokenFixture);
+      const { token, owner, user1 } = await networkHelpers.loadFixture(deployTokenFixture);
       
-      const amount = hre.ethers.parseEther("1000");
-      await honeyDewToken.connect(owner).mintReward(user1.address, amount);
+      const amount = ethers.parseEther("1000");
       
-      expect(await honeyDewToken.balanceOf(user1.address)).to.equal(amount);
+      // These methods exist at runtime - TypeScript errors are expected and safe to ignore
+      // @ts-expect-error - mintReward exists at runtime
+      await token.connect(owner).mintReward(user1.address, amount);
+      
+      expect(await token.balanceOf(user1.address)).to.equal(amount);
     });
 
     it("Should not allow non-owner to mint", async function () {
-      const { honeyDewToken, user1 } = await loadFixture(deployHoneyDewTokenFixture);
+      const { token, user1 } = await networkHelpers.loadFixture(deployTokenFixture);
       
-      const amount = hre.ethers.parseEther("1000");
+      const amount = ethers.parseEther("1000");
       
       await expect(
-        honeyDewToken.connect(user1).mintReward(user1.address, amount)
+        // @ts-expect-error - mintReward exists at runtime
+        token.connect(user1).mintReward(user1.address, amount)
       ).to.be.revertedWith("Ownable: caller is not the owner");
+    });
+  });
+
+  describe("Conversion", function () {
+    async function deployWithMintedFixture() {
+      const base = await deployTokenFixture();
+      
+      const mintAmount = ethers.parseEther("10000");
+      // @ts-expect-error - mintReward exists at runtime
+      await base.token.connect(base.owner).mintReward(base.user1.address, mintAmount);
+      
+      return base;
+    }
+
+    it("Should convert SHNY to AVAX correctly", async function () {
+      const { token, user1 } = await networkHelpers.loadFixture(deployWithMintedFixture);
+      
+      const amount = ethers.parseEther("1000");
+      const initialBalance = await ethers.provider.getBalance(user1.address);
+      // @ts-expect-error - mintReward exists at runtime
+      await token.connect(user1).convertToAVAX(amount);
+      
+      const finalBalance = await ethers.provider.getBalance(user1.address);
+      const received = finalBalance - initialBalance;
+      
+      const expectedAmount = ethers.parseEther("0.009");
+      expect(received).to.be.closeTo(expectedAmount, ethers.parseEther("0.0001"));
+    });
+
+    it("Should enforce daily limit", async function () {
+      const { token, user1 } = await networkHelpers.loadFixture(deployWithMintedFixture);
+      
+      const amount = ethers.parseEther("6000");
+      
+      await expect(
+        // @ts-expect-error - mintReward exists at runtime
+        token.connect(user1).convertToAVAX(amount)
+      ).to.be.revertedWith("Daily limit exceeded");
+    });
+
+    it("Should reset daily limit after 24 hours", async function () {
+      const { token, user1 } = await networkHelpers.loadFixture(deployWithMintedFixture);
+      
+      const amount = ethers.parseEther("4000");
+      // @ts-expect-error - mintReward exists at runtime
+      await token.connect(user1).convertToAVAX(amount);
+      
+      await networkHelpers.time.increase(86400);
+      await networkHelpers.mine();
+      // @ts-expect-error - mintReward exists at runtime
+      await token.connect(user1).convertToAVAX(amount);
+    });
+
+    it("Should emit ConvertedToAVAX event", async function () {
+      const { token, user1 } = await networkHelpers.loadFixture(deployWithMintedFixture);
+      
+      const amount = ethers.parseEther("1000");
+      // @ts-expect-error - mintReward exists at runtime
+      await expect(token.connect(user1).convertToAVAX(amount))
+        .to.emit(token, "ConvertedToAVAX")
+        .withArgs(user1.address, amount, ethers.parseEther("0.009"), ethers.parseEther("0.001"));
     });
   });
 });

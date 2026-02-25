@@ -5,12 +5,13 @@
   "main": "index.js",
   "scripts": {
     "compile": "hardhat compile",
-    "test": "hardhat test",
-    "test:solidity": "hardhat test test/solidity/**/*.sol",
+    "test:typescript": "hardhat test test/**/*.test.ts",
+    "test:solidity": "hardhat test test/solidity/**/*.t.sol",
     "coverage": "hardhat coverage",
-    "gas": "hardhat test --gas",
     "deploy:fuji": "hardhat ignition deploy ignition/modules/DeployAll.ts --network fuji",
     "deploy:mainnet": "hardhat ignition deploy ignition/modules/DeployAll.ts --network avalanche",
+    "test": "hardhat test",
+    "gas": "hardhat test --gas",
     "verify:fuji": "hardhat run scripts/verify.ts --network fuji",
     "verify:mainnet": "hardhat run scripts/verify.ts --network avalanche"
   },
@@ -26,6 +27,8 @@
     "@nomicfoundation/hardhat-network-helpers": "^3.0.3",
     "@nomicfoundation/hardhat-toolbox-mocha-ethers": "^3.0.2",
     "@nomicfoundation/hardhat-typechain": "^3.0.2",
+    "@nomicfoundation/hardhat-verify": "^3.0.10",
+    "@typechain/ethers-v6": "^0.5.1",
     "@types/chai": "^4.3.20",
     "@types/chai-as-promised": "^8.0.2",
     "@types/mocha": "^10.0.10",
@@ -35,6 +38,7 @@
     "forge-std": "github:foundry-rs/forge-std#v1.9.4",
     "hardhat": "^3.1.9",
     "mocha": "^11.7.5",
+    "typechain": "^8.3.2",
     "typescript": "~5.8.0"
   },
   "dependencies": {
