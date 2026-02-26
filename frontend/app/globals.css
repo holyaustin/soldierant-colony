@@ -1,0 +1,29 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #8B5A2B;
+  --color-secondary: #4A3B2A;
+  --color-accent: #C69C6D;
+  --color-ant-black: #1A1A1A;
+  --color-ant-gold: #B8860B;
+  
+  --font-display: "Cinzel", serif;
+  --font-body: "Inter", sans-serif;
+  
+  --animate-pulse-slow: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Custom animations for ant theme */
+@keyframes march {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(10px); }
+}
+
+.animate-march {
+  animation: march 2s ease-in-out infinite;
+}
+
+/* Ant trail glow effect */
+.ant-trail {
+  background: radial-gradient(circle at center, rgba(184, 134, 11, 0.2) 0%, transparent 70%);
+}

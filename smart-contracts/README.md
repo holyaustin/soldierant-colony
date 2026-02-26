@@ -121,5 +121,3 @@ DeployAll#ColonyManager - 0x7d6123df397D847539fa597B4D74bD5C3e7B9d54
 DeployAll#TerritoryStaking - 0xA27aFFA1e4CB64C415C6707a78f24c7E21D43c6A
 DeployAll#TournamentSystem - 0x31602660411B6e83e78dFCCE4e0B6C2446Ac5Fa8
 
-
-npx hardhat verify --network fuji 0xA27aFFA1e4CB64C415C6707a78f24c7E21D43c6A
