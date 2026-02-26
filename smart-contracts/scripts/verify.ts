@@ -9,8 +9,8 @@ async function main() {
   // Replace these with your actual deployed contract addresses
   const addresses = {
     fuji: {
-      honeyDewToken: "0x...", // Replace with your Fuji deployment address
-      antNFT: "0x...", // Replace with your Fuji deployment address
+      honeyDewToken: "0xFD945D4F40479106Ef3Bb857E72e2ea5b7d742EB", // Replace with your Fuji deployment address
+      antNFT: "0x4158173D4333537e719523dFd0309785B9bBB2FC", // Replace with your Fuji deployment address
     },
     avalanche: {
       honeyDewToken: "0x...", // Replace with your Mainnet deployment address

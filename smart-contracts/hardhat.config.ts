@@ -11,6 +11,11 @@ import * as dotenv from "dotenv";
 
 dotenv.config();
 
+const AVALANCHE_FUJI_RPC = process.env.AVALANCHE_FUJI_RPC || "https://api.avax-test.network/ext/bc/C/rpc";
+const AVALANCHE_MAINNET_RPC = process.env.AVALANCHE_MAINNET_RPC || "https://api.avax.network/ext/bc/C/rpc";
+const PRIVATE_KEY = process.env.PRIVATE_KEY || "";
+const SNOWTRACE_API_KEY = process.env.SNOWTRACE_API_KEY || "";
+
 export default defineConfig({
   plugins: [
     hardhatVerify,
@@ -33,6 +38,7 @@ export default defineConfig({
             enabled: true,
             runs: 200,
           },
+          viaIR: true,  // Add this line - critical for stack too deep errors
         },
       },
     },
@@ -70,10 +76,34 @@ export default defineConfig({
   },
   verify: {
     etherscan: {
-      apiKey: process.env.ETHERSCAN_API_KEY || "",
+      apiKey: SNOWTRACE_API_KEY,
     },
     blockscout: {
-      enabled: true,
+       enabled: false, // Disable Blockscout for Avalanche
     },
   },
+
+    chainDescriptors: {
+    43113: {
+      name: "Avalanche Fuji Testnet",
+      blockExplorers: {
+        etherscan: {
+          name: "Snowtrace",
+          url: "https://testnet.snowtrace.io",
+          apiUrl: "https://api-testnet.snowtrace.io/api",
+        },
+      },
+    },
+    43114: {
+      name: "Avalanche Mainnet",
+      blockExplorers: {
+        etherscan: {
+          name: "Snowtrace",
+          url: "https://snowtrace.io",
+          apiUrl: "https://api.snowtrace.io/api",
+        },
+      },
+    },
+  },
+  
 });

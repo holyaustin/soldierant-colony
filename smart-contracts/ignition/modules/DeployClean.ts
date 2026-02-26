@@ -1,15 +1,12 @@
 import { buildModule } from "@nomicfoundation/hardhat-ignition/modules";
 
-const DeployAllModule = buildModule("DeployAll", (m) => {
-  // Note: Balance checking is better done in a script, not in the Ignition module
-  // Use the check-balance.ts script we created earlier to verify your balance before deploying
-
-  // Deploy HoneyDewToken
+const DeployCleanModule = buildModule("DeployClean", (m) => {
+  // Deploy HoneyDewToken - no constructor args
   const honeyDewToken = m.contract("HoneyDewToken", [], {
     id: "HoneyDewToken",
   });
 
-  // Deploy AntNFT
+  // Deploy AntNFT - no constructor args
   const antNFT = m.contract("AntNFT", [], {
     id: "AntNFT",
     after: [honeyDewToken],
@@ -47,23 +44,23 @@ const DeployAllModule = buildModule("DeployAll", (m) => {
 
   // Set addresses in ColonyManager
   m.call(colonyManager, "setTerritoryStaking", [territoryStaking], {
-    id: "SetTerritoryStaking_InColonyManager",
+    id: "SetTerritoryStaking",
     after: [territoryStaking],
   });
 
   m.call(colonyManager, "setTournamentSystem", [tournamentSystem], {
-    id: "SetTournamentSystem_InColonyManager",
+    id: "SetTournamentSystem",
     after: [tournamentSystem],
   });
 
   // Set addresses in AntNFT
   m.call(antNFT, "setColonyManager", [colonyManager], {
-    id: "SetColonyManager_InAntNFT",
+    id: "SetColonyManager",
     after: [colonyManager],
   });
 
   m.call(antNFT, "setTournamentSystem", [tournamentSystem], {
-    id: "SetTournamentSystem_InAntNFT",
+    id: "SetTournamentSystemInAntNFT",
     after: [tournamentSystem],
   });
 
@@ -76,4 +73,4 @@ const DeployAllModule = buildModule("DeployAll", (m) => {
   };
 });
 
-export default DeployAllModule;
+export default DeployCleanModule;
