@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { Inter, Cinzel } from 'next/font/google';
-import { PrivyProvider } from '@/components/providers/PrivyProvider';
+import { Providers } from '@/components/providers/PrivyProvider'; // Updated import
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import './globals.css';
@@ -21,11 +21,11 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className={`${inter.variable} ${cinzel.variable} font-body bg-ant-black text-white`}>
-        <PrivyProvider>
+        <Providers> {/* Use the wrapper that includes WagmiProvider */}
           <Header />
           <main className="min-h-screen pt-20">{children}</main>
           <Footer />
-        </PrivyProvider>
+        </Providers>
       </body>
     </html>
   );

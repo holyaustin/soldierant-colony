@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePrivy } from '@privy-io/react-auth';
-import { useAccount, useBalance } from 'wagmi'; // Removed useNetwork
+import { useAccount, useBalance } from 'wagmi'; 
 import { motion } from 'framer-motion';
 
 export default function Header() {
@@ -64,11 +64,12 @@ export default function Header() {
         <Link href="/" className="flex items-center gap-2">
           <div className="relative w-10 h-10">
             <Image
-              src="/images/ant-icon.svg"
+              src="/images/logo2.jpg"
               alt="Soldier Ant"
               fill
               className="object-contain"
               priority
+              sizes="40px" // Added missing sizes prop for performance
             />
           </div>
           <span className="font-display text-xl font-bold bg-gradient-to-r from-ant-gold to-primary bg-clip-text text-transparent">

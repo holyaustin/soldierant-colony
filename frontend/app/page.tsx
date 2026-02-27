@@ -2,8 +2,13 @@
 
 import { motion, useScroll, useTransform } from 'framer-motion';
 import Image from 'next/image';
-import Link from 'next/link';
 import { usePrivy } from '@privy-io/react-auth';
+import dynamic from 'next/dynamic';
+
+// Fix: Load window-dependent animations only on the client
+const AntAnimations = dynamic(() => import('@/components/AntAnimations'), { 
+  ssr: false 
+});
 
 export default function HomePage() {
   const { login, authenticated } = usePrivy();
@@ -19,34 +24,14 @@ export default function HomePage() {
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden">
-      {/* Animated background with ant trail effect */}
+    <div className="relative min-h-screen overflow-hidden bg-ant-black">
+      {/* Background layer */}
       <div className="absolute inset-0 bg-gradient-to-b from-ant-black via-ant-black/95 to-primary/20">
-        <div className="absolute inset-0 opacity-30">
-          {[...Array(20)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute w-1 h-1 bg-ant-gold rounded-full ant-trail"
-              initial={{
-                x: Math.random() * window.innerWidth,
-                y: Math.random() * window.innerHeight,
-              }}
-              animate={{
-                x: [null, Math.random() * 100 - 50],
-                y: [null, Math.random() * 100 - 50],
-              }}
-              transition={{
-                duration: 10 + Math.random() * 20,
-                repeat: Infinity,
-                repeatType: 'reverse',
-              }}
-            />
-          ))}
-        </div>
+        <AntAnimations />
       </div>
 
       {/* Hero content */}
-      <div className="relative container mx-auto px-4 pt-32 pb-20">
+      <div className="relative container mx-auto px-4 pt-4 pb-20 z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <motion.div
             initial={{ opacity: 0, x: -50 }}
@@ -56,10 +41,10 @@ export default function HomePage() {
             <h1 className="font-display text-5xl md:text-7xl mb-6">
               <span className="block text-white">Build Your</span>
               <span className="block bg-gradient-to-r from-ant-gold to-primary bg-clip-text text-transparent">
-                Ant Empire
+                Ant Colony
               </span>
             </h1>
-            <p className="text-xl text-gray-300 mb-8">
+            <p className="text-xl text-gray-400 mb-8 max-w-lg">
               Breed unique soldier ants, conquer territories, and earn real rewards
               in the first sustainable Web3 strategy game on Avalanche.
             </p>
@@ -68,11 +53,10 @@ export default function HomePage() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={handlePlayClick}
-              className="relative px-12 py-5 text-2xl font-bold rounded-lg overflow-hidden group"
+              className="relative px-12 py-5 text-2xl font-bold rounded-xl overflow-hidden group shadow-2xl shadow-primary/20"
             >
-              <span className="absolute inset-0 bg-gradient-to-r from-primary to-ant-gold opacity-80 group-hover:opacity-100 transition"></span>
-              <span className="absolute inset-0 bg-[url('/images/ant-pattern.png')] opacity-20 group-hover:animate-march"></span>
-              <span className="relative z-10 flex items-center gap-3">
+              <span className="absolute inset-0 bg-gradient-to-r from-primary to-ant-gold"></span>
+              <span className="relative z-10 flex items-center gap-3 text-white">
                 {!authenticated ? 'Connect to Play' : 'Enter Colony'}
                 <motion.span
                   animate={{ x: [0, 10, 0] }}
@@ -83,68 +67,42 @@ export default function HomePage() {
               </span>
             </motion.button>
 
-            <div className="mt-8 flex gap-6 text-sm text-gray-400">
-              <span>⚔️ 10K+ Soldiers</span>
-              <span>🏆 Daily Tournaments</span>
-              <span>💰 50M $HNY Supply</span>
+            <div className="mt-12 flex gap-8 text-sm font-medium text-gray-500 uppercase tracking-widest">
+              <span className="flex items-center gap-2">⚔️ 10K Soldiers</span>
+              <span className="flex items-center gap-2">🏆 Tournaments</span>
             </div>
           </motion.div>
 
           <motion.div
             style={{ y }}
-            initial={{ opacity: 0, scale: 0.8 }}
+            initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="relative h-[500px]"
+            transition={{ duration: 1, ease: "easeOut" }}
+            className="relative h-[450px] md:h-[600px] flex justify-center items-center"
           >
-            <Image
-              src="/images/soldier-ant-hero.png"
-              alt="Soldier Ant"
-              fill
-              className="object-contain"
-              priority
-              sizes="(max-width: 768px) 100vw, 50vw"
-            />
-            
-            {/* Floating ants around hero */}
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-              className="absolute inset-0"
-            >
-              {[...Array(5)].map((_, i) => (
-                <motion.div
-                  key={i}
-                  className="absolute w-8 h-8"
-                  style={{
-                    top: `${Math.sin(i * 72) * 180 + 50}%`,
-                    left: `${Math.cos(i * 72) * 180 + 50}%`,
-                  }}
-                >
-                  <Image
-                    src="/images/ant-icon.svg"
-                    alt=""
-                    width={32}
-                    height={32}
-                    className="opacity-50"
-                  />
-                </motion.div>
-              ))}
-            </motion.div>
+            <div className="relative w-full h-full">
+               <Image
+                src="/images/ant.jpg"
+                alt="Soldier Ant Hero"
+                fill
+                className="object-contain drop-shadow-[0_0_50px_rgba(251,191,36,0.2)]"
+                priority
+              />
+            </div>
           </motion.div>
         </div>
-
-        {/* Animated scroll indicator */}
-        <motion.div
-          animate={{ y: [0, 10, 0] }}
-          transition={{ duration: 1.5, repeat: Infinity }}
-          className="absolute bottom-10 left-1/2 transform -translate-x-1/2"
-        >
-          <div className="w-6 h-10 border-2 border-ant-gold/50 rounded-full flex justify-center">
-            <div className="w-1 h-2 bg-ant-gold rounded-full mt-2"></div>
-          </div>
-        </motion.div>
       </div>
+
+      {/* Scroll Indicator */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1 }}
+        className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+      >
+        <span className="text-[10px] text-ant-gold/40 uppercase tracking-[0.3em]">Scroll</span>
+        <div className="w-px h-12 bg-gradient-to-b from-ant-gold/50 to-transparent" />
+      </motion.div>
     </div>
   );
 }
