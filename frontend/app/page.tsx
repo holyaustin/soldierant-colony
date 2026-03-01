@@ -78,11 +78,11 @@ export default function HomePage() {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1, ease: "easeOut" }}
-            className="relative h-[450px] md:h-[600px] flex justify-center items-center"
+            className="relative h-[450px] md:h-[780px] flex justify-center items-center"
           >
             <div className="relative w-full h-full">
                <Image
-                src="/images/ant.jpg"
+                src="/assets/bg1.gif"
                 alt="Soldier Ant Hero"
                 fill
                 className="object-contain drop-shadow-[0_0_50px_rgba(251,191,36,0.2)]"
