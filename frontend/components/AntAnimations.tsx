@@ -28,7 +28,7 @@ export default function AntAnimations() {
           poster="/images/soil-texture.png" // Fallback from your provided image
           className="absolute inset-0 w-full h-full object-cover opacity-40 grayscale-[0.5]"
         >
-          <source src="/images/SoldierAntLong.mkv" type="video/mp4" />
+          <source src="/videos/antcolony.mp4" type="video/mp4" />
           Your browser does not support the video tag.
         </video>
         {/* Dark overlay to ensure text readability */}
